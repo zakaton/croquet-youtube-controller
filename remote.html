@@ -1,0 +1,279 @@
+<html>
+    <head>
+        <title>Croquet</title>
+        <script src="https://croquet.studio/sdk/croquet-latest.min.js"></script>
+        <script src="extension/Model.js"></script>
+        <script src="extension/View.js"></script>
+        <script src="https://www.youtube.com/iframe_api"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    </head>
+
+    <style>
+        html, body {
+            margin : auto;
+            padding: 0;
+
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        [data-tab] {
+            overflow: hidden;
+            position: fixed;
+            transition: left 1s;
+            display: grid;
+
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+    <style>
+        [data-tab="scroll"] {
+            left: 0%;
+
+            grid-template-rows: 80% 1fr;
+            grid-template-columns: 50% 1fr;
+
+            align-items: center;
+        }
+
+        [data-tab="scroll"] > [data-cell] {
+            font-size: 36px;
+            text-align: center;
+        }
+
+        [data-cell="scroll"] {
+            height: 100%;
+
+            grid-row: 1;
+            grid-column: 1 / span 2;
+
+            background-color: hsl(0, 0%, 80%);
+        }
+
+        [data-cell="tilt"] {
+            grid-row: 2;
+            grid-column: 1;
+        }
+
+        [data-cell="select"] {
+            grid-row: 2;
+            grid-column: 2;
+        }
+    </style>
+
+    <style>
+        [data-tab="video"] {
+            left: 100%;
+            grid-template-columns: 33% 33% 33%;
+            text-align: center;
+        }
+
+        [data-tab="video"] > [data-cell].control {
+            text-align: center;
+        }
+
+        [data-type="playback"] {
+            grid-row: 7;
+            font-size: 48px;
+        }
+
+        [data-cell="play-pause"] {
+            grid-column: 2;
+        }
+
+        [data-cell="play-pause"]:not([data-playing]):after {
+            content: '▶️️';
+        }
+        [data-cell="play-pause"][data-playing]:after {
+            content: '⏸️';
+        }
+
+        [data-cell="player"] {
+            width: 100px;
+            height: 100px;
+
+            grid-row: 7;
+            grid-column: 2;
+        }
+        [data-cell="player"][data-selected] {
+            display: none;
+        }
+
+        [data-cell="backward"] {
+            grid-column: 1;
+        }
+
+        [data-cell="forward"] {
+            grid-column: 3;
+        }
+
+        [data-cell="timeline"] {
+            grid-row: 6;
+            grid-column: 1 / span 3;
+
+            width: 80%;
+            justify-self: center;
+            -webkit-appearance: none;
+            border-radius: 5px;
+            height: 10px;
+            background: hsl(0, 0%, 80%);
+        }
+        [data-cell="timeline"]::-webkit-slider-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%; 
+        }
+
+        [data-type="rate"] {
+            opacity : 0.5;
+            grid-column: 1 / span 2;
+            font-size: 56px;
+        }
+
+        [data-cell="like"] {
+            grid-row: 4;
+        }
+
+        [data-cell="dislike"] {
+            grid-row: 5;
+        }
+
+        [data-type="rate"][data-selected] {
+            opacity: 1;
+        }
+
+        [data-cell="volume"] {
+            grid-row: 4 / span 2;
+            grid-column: 3;
+
+            -webkit-appearance: slider-vertical;
+            height: 80%;
+
+            margin-left: -60%;            
+        }
+
+        [data-cell="volume"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+        }
+
+        [data-cell="comment-box"] {
+            grid-row: 2;
+            grid-column: 1 / span 3;
+            font-size: 14px;
+        }
+        [data-cell="comment"] {
+            grid-row: 3;
+            grid-column: 1 / span 3;
+            font-size: 14px;
+        }
+
+        [data-cell="subscribe"] {
+            grid-row: 1;
+            grid-column : 1 / span 3;
+            font-size: 20px;
+
+            border-radius: 15px;
+        }
+        [data-cell="subscribe"]:not([data-subscribed]) {
+            background-color: red;
+        }
+
+        [data-cell="subscribe"]:not([data-subscribed]):after {
+            content: "Subscribe";
+        }
+        [data-cell="subscribe"][data-subscribed]:after {
+            content: "Unsubscribe";
+        }
+    </style>
+
+    <body>
+        <div data-tab="scroll">
+            <div id="scroll" data-cell="scroll"></div>
+            <div id="tilt" data-cell="tilt"> 👋 </div>
+            <div id="select" data-cell="select">▶️</div>
+        </div>
+
+        <div data-tab="video">
+            <div id="backward" class="control" data-type="playback" data-cell="backward">⏪</div>
+            <div id="playPause" class="control" data-type="playback" data-cell="play-pause"></div>
+            <div id="forward" class="control" data-type="playback" data-cell="forward">⏩</div>
+
+            <input id="timeline" data-cell="timeline" type="range" min="0" max="1" step="0.1">
+
+            <div id="like" class="control" data-type="rate" data-cell="like">👍</div>
+            <div id="dislike" class="control" data-type="rate" data-cell="dislike">👎</div>
+            <input id="volume" data-cell="volume" type="range" min="0" max="100" step="1">
+
+            <button id="subscribe" data-cell="subscribe"></button>
+
+            <input id="commentTextarea" type="textarea" data-cell="comment-box"></input>
+            <button id="commentButton" disabled data-cell="comment">Post Comment</button>
+
+            <iframe id="player"
+                    width="50" height="50"
+                    allow 
+                    src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1&autoplay=1&origin=https://10.0.0.104:80&playsinline=1&controls=1"
+                    frameborder="0"
+                    data-cell="player"
+            ></iframe>
+        </div>
+    </body>
+
+    <script>
+        const scrollTab = document.querySelector(`[data-tab="scroll"]`);
+        const videoTab = document.querySelector(`[data-tab="video"]`);
+        
+        const scrollIntoView = (tab) => {
+            if(tab == "scroll") {
+                scrollTab.style.left = "0%";
+                videoTab.style.left = "100%";
+            }
+            else if(tab == "video") {
+                scrollTab.style.left = "-100%";
+                videoTab.style.left = "0%";
+            }
+        };
+    </script>
+
+    <script>
+        const scroll = document.getElementById("scroll");
+
+    </script>
+
+    <script>
+        var _player;
+        function onYouTubeIframeAPIReady() {
+            _player = new YT.Player('player', {
+                playerVars: {
+                    
+                },
+                events: {
+                    'onStateChange' : function(event) {
+                        if(event.data == YT.PlayerState.PLAYING) {
+                            if(player.dataset.selected == undefined) {
+                                window.view.setPlaybackMode("play");        
+                            }
+                            player.dataset.selected = '';
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script>
+        Croquet.startSession("ukaton/croquet", Model, RemoteView)
+            .then(session => {
+                
+            });
+    </script>
+</html>

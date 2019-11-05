@@ -1,0 +1,14 @@
+#widgets {
+    position: fixed;
+    width: 116px;
+    top: 4px;
+    right: 4px;
+    font-size: 0;
+    background: white;
+}
+#widgets div {
+    margin: 8px;
+}
+#widgets #text_stats {
+    font-size: 12px;
+}

@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>Croquet</title>
+        <script src="https://croquet.studio/sdk/croquet-latest.min.js"></script>
+    </head>
+
+    <body>
+
+    </body>
+
+    <script>
+        class MyModel extends Croquet.Model {
+            init() {
+
+            }
+        }
+
+        MyModel.register();
+    </script>
+
+    <script>
+        class MyView extends Croquet.View {
+            constructor(model) {
+                super(model);
+            }
+
+            update(time) {
+                //console.log(time);
+            }
+        }
+    </script>
+
+    <script>
+        Croquet.startSession("mySession", MyModel, MyView);
+    </script>
+
+    <script src="widget.js"></script>
+    <link rel="stylesheet" href="widget.css">
+</html>
